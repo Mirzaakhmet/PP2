@@ -7,7 +7,7 @@ pygame.init()
 mixer.init()
 
 screen = pygame.display.set_mode((600, 173))
-pygame.display.set_caption("MP3 Player ежже")
+pygame.display.set_caption("MP3 Player ЕЖЖЕ")
 
 past_img = pygame.image.load(r"C:/Users/Asus/Documents/Little/PP2/lab7/images/past.jpg")
 past2_img = pygame.image.load(r"C:/Users/Asus/Documents/Little/PP2/lab7/images/past2.png")
@@ -24,7 +24,7 @@ height = screen.get_height()
 music_folder = "C:/Users/Asus/Documents/Little/PP2/lab7/music/"
 playlist = [os.path.join(music_folder, f) for f in os.listdir(music_folder) if f.endswith(".mp3")]
 
-nomer = 0 
+nomer = 0  
 is_playing = False
 is_paused = False
 paused_pos = 0
@@ -38,7 +38,7 @@ def load_and_play():
         is_playing = True
         is_paused = False
     except pygame.error:
-        print(f"Ошибка: файл {playlist[nomer]} не найден")
+        print(f"Ошибка: файл {playlist[nomer]} не найден, ну тип она все равно найдется")
 
 while True:
     screen.fill((255, 255, 255))  
@@ -63,7 +63,7 @@ while True:
                     is_paused = True
 
             # Stop
-            elif width / 3 <= mouse[0] <= width / 1.5 and 0 <= mouse[1] <= height:
+            elif width / 1.5 <= mouse[0] <= width and 0 <= mouse[1] <= height:
                 mixer.music.stop()
                 is_playing = False
                 is_paused = False
@@ -72,12 +72,42 @@ while True:
             # Next
             elif width / 1.5 <= mouse[0] <= width and 0 <= mouse[1] <= height:
                 nomer = (nomer + 1) % len(playlist)
+                paused_pos = 0
                 load_and_play()
 
             # Previous
             elif 0 <= mouse[0] <= width / 3 and 0 <= mouse[1] <= height:
-                nomer = (nomer - 1) % len(playlist)
+                nomer = (nomer - 1) % len(playlist) if nomer > 0 else len(playlist) - 1
+                paused_pos = 0
                 load_and_play()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                if not is_playing:
+                    load_and_play()
+                elif is_paused:
+                    mixer.music.unpause()
+                    is_paused = False
+                else:
+                    paused_pos = mixer.music.get_pos() / 1000
+                    mixer.music.pause()
+                    is_paused = True
+
+            elif event.key == pygame.K_RIGHT:
+                nomer = (nomer + 1) % len(playlist)
+                paused_pos = 0
+                load_and_play()
+
+            elif event.key == pygame.K_LEFT:
+                nomer = (nomer - 1) % len(playlist) if nomer > 0 else len(playlist) - 1
+                paused_pos = 0
+                load_and_play()
+
+            elif event.key == pygame.K_s:
+                mixer.music.stop()
+                is_playing = False
+                is_paused = False
+                paused_pos = 0
 
     # Past
     if 0 <= mouse[0] <= width / 3 and 0 <= mouse[1] <= height:
