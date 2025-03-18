@@ -63,7 +63,7 @@ while True:
                     is_paused = True
 
             # Stop
-            elif width / 1.5 <= mouse[0] <= width and 0 <= mouse[1] <= height:
+            elif width / 3 <= mouse[0] <= width / 1.5 and 0 <= mouse[1] <= height:
                 mixer.music.stop()
                 is_playing = False
                 is_paused = False
