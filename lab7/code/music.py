@@ -28,7 +28,7 @@ nomer = 0
 is_playing = False
 is_paused = False
 paused_pos = 0
-mixer.music.set_volume(0.5)
+mixer.music.set_volume(1)
 
 def load_and_play():
     global is_playing, is_paused, paused_pos
