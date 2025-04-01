@@ -47,7 +47,7 @@ class Enemy(pygame.sprite.Sprite):
         global score
         self.rect.move_ip(0, speed)
         if self.rect.top > screen_height:
-            score += 1  # Увеличение счета при прохождении врага
+            score += 1
             self.rect.center = (random.randint(40, screen_width - 40), -20)
 
 # Класс игрока
@@ -65,27 +65,22 @@ class Player(pygame.sprite.Sprite):
         if self.rect.right < screen_width and pressed_keys[pygame.K_RIGHT]:
             self.rect.move_ip(5, 0)
 
-# Класс монеты
+# Класс монеты (теперь тип монеты задаётся при создании)
 class Coin(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, value):
         super().__init__()
-        # Вес монет и соответствующие изображения
-        self.weights = {1: "C:/Users/Asus/Documents/Little/PP2/lab9/image/coin1.png", 
-                        2: "C:/Users/Asus/Documents/Little/PP2/lab9/image/coin2.png", 
-                        5: "C:/Users/Asus/Documents/Little/PP2/lab9/image/coin.png"}
-        self.value, image_path = self.random_coin()
-        self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (80, 80))  # Установка одинакового размера монет
+        self.weights = {
+            1: "C:/Users/Asus/Documents/Little/PP2/lab9/image/coin1.png",
+            2: "C:/Users/Asus/Documents/Little/PP2/lab9/image/coin2.png",
+            5: "C:/Users/Asus/Documents/Little/PP2/lab9/image/coin.png"
+        }
+        self.value = value  # Теперь тип монеты задаётся явно
+        self.image = pygame.image.load(self.weights[value])
+        self.image = pygame.transform.scale(self.image, (80, 80))
         self.rect = self.image.get_rect()
         self.spawn()
     
-    def random_coin(self):
-        # Выбор случайной монеты (1, 2 или 5 очков)
-        value = random.choices([1, 2, 5], weights=[70, 20, 10])[0]
-        return value, self.weights[value]
-    
     def spawn(self):
-        # Спавн монеты в случайном месте
         self.rect.center = (random.randint(22, screen_width - 22), random.randint(-100, -20))
     
     def move(self):
@@ -96,9 +91,12 @@ class Coin(pygame.sprite.Sprite):
 # Настройка игры
 P1 = Player()
 E1 = Enemy()
+
+# Создаём 3 монеты: 1, 2 и 5
 coins = pygame.sprite.Group()
-for _ in range(3):
-    coins.add(Coin())
+coins.add(Coin(1))  # Монета 1
+coins.add(Coin(2))  # Монета 2
+coins.add(Coin(5))  # Монета 5
 
 all_sprites = pygame.sprite.Group(P1, E1, *coins)
 
@@ -118,15 +116,14 @@ while running:
     
     for coin in coins:
         if pygame.sprite.collide_circle(P1, coin):
-            coin_score += coin.value  # Увеличение счетчика монет на значение монеты
+            coin_score += coin.value
             coin_sound.play()
             coin.spawn()
             if coin_score >= N:
-                speed += 1  # Увеличение скорости врагов при наборе N монет
+                speed += 1
                 coin_score = 0
     
     if pygame.sprite.spritecollideany(P1, pygame.sprite.Group(E1)):
-        # Проверка столкновения с врагом (конец игры)
         crash_sound.play()
         screen.fill(red)
         screen.blit(game_over, (30, 250))
