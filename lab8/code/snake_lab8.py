@@ -149,7 +149,9 @@ while running:
             game_over_text = font.render(f"Game Over! High Score: {high_score}", True, TEXT_COLOR)
             screen.blit(game_over_text, game_over_text.get_rect(center=(WIN_WIDTH//2, WIN_HEIGHT//2 - 50)))
         else:
-
+            # Рассчитываем текущую скорость в зависимости от уровня
+            current_smooth_move_interval = SMOOTH_MOVE_INTERVAL * (0.9 ** (game_state['level'] - 1))
+            
             move_timer += dt
 
             if not current_move_computed:
@@ -180,7 +182,7 @@ while running:
                     current_move_computed = True
 
 
-            f = min(move_timer / SMOOTH_MOVE_INTERVAL, 1)
+            f = min(move_timer / current_smooth_move_interval, 1)
 
 
             for i in range(len(snake_target)):
@@ -200,7 +202,7 @@ while running:
             pygame.draw.rect(screen, FOOD_COLOR, (fx * CELL_SIZE + 2, fy * CELL_SIZE + 2, CELL_SIZE - 4, CELL_SIZE - 4))
 
 
-            if move_timer >= SMOOTH_MOVE_INTERVAL:
+            if move_timer >= current_smooth_move_interval:
                 # обнова состояние змейки
                 game_state['snake'] = snake_target
                 # если уже хавнул еду, то спавним новую и счет +1
@@ -210,7 +212,7 @@ while running:
                         game_state['level'] += 1
                     game_state['food'] = get_random_food(game_state['snake'])
                 # сброс таймера для анимации
-                move_timer -= SMOOTH_MOVE_INTERVAL
+                move_timer -= current_smooth_move_interval
                 current_move_computed = False
 
             # счетчик сверху
